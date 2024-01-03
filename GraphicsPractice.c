@@ -185,7 +185,7 @@ int main() {
 		}
 
 		choice = 0;
-		Sleep(50);
+		Sleep(80);
 	}
 
 	return 0;
