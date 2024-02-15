@@ -52,14 +52,6 @@ int main() {
 	float zVal[height][width]; // z-value of points
 
 	int choice = 0;
-	
-	INPUT virtualEnter;
-	virtualEnter.type = INPUT_KEYBOARD;
-	virtualEnter.ki.wScan = 0;
-	virtualEnter.ki.time = 0;
-	virtualEnter.ki.dwExtraInfo = 0;
-	virtualEnter.ki.wVk = 0x0D;
-	virtualEnter.ki.dwFlags = 0;
 
 	while (choice != KEY_0)
 	{
@@ -123,7 +115,8 @@ int main() {
 			strcat(str, "\n");
 		}
 		printf("%s", str);
-		
+
+		choice = 0;
 		while (choice == 0)
 		{
 			for (int i = 0; i < NUM_KEYS; i++)
@@ -184,7 +177,6 @@ int main() {
 				break;
 		}
 
-		choice = 0;
 		Sleep(80);
 	}
 
