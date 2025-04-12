@@ -28,3 +28,5 @@ W/A/S/D: Move sphere up/left/down/right
 Q/E: Move sphere away/towards viewport
 
 I/J/K/L: Rotate light source up/left/down/right
+
+0: Quit
