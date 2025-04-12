@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#ifdef _WIN32
 #include <Windows.h>
-#endif
 
 #define PI 3.141593f
 
@@ -23,11 +21,9 @@
 #define KEY_J 0x4A
 #define KEY_K 0x4B
 #define KEY_L 0x4C
-#define KEY_U 0x55
-#define KEY_O 0x4F
 #define KEY_0 0x30
 
-#define NUM_KEYS 13
+#define NUM_KEYS 11
 
 // Displacement of sphere from origin
 float xDisp = 0.0f;
@@ -44,8 +40,10 @@ float xLight = 0;
 float yLight = 0;
 float zLight = -1;
 
-const float sinLightInc = 0.006283144f;
-const float cosLightInc = 0.9999803f;
+const float sinLightInc = 0.01256604f;
+const float cosLightInc = 0.9999210f;
+
+const float shininess = 5.0f;
 
 int rotationCount = 0;
 const int rotationLimit = 500;
@@ -55,27 +53,25 @@ const float deltaTheta = 0.01f;
 const float deltaPhi = 0.02f;
 
 int keys[NUM_KEYS] = {KEY_W, KEY_A, KEY_S, KEY_D, KEY_Q, KEY_E,
-					  KEY_I, KEY_J, KEY_K, KEY_L, KEY_U, KEY_O,
+					  KEY_I, KEY_J, KEY_K, KEY_L,
 					  KEY_0};
 
-void normalizeLight()
+void normalize(float *x, float *y, float *z)
 {
-	float ooMagLight = 1 / sqrtf(xLight * xLight + yLight * yLight + zLight * zLight);
-	xLight *= ooMagLight;
-	yLight *= ooMagLight;
-	zLight *= ooMagLight;
+	float ooMag = 1 / sqrtf(*x * *x + *y * *y + *z * *z);
+	*x *= ooMag;
+	*y *= ooMag;
+	*z *= ooMag;
 }
 
 int main()
 {
-#ifdef _WIN32
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	DWORD mode;
 	if (GetConsoleMode(console, &mode))
 	{
 		SetConsoleMode(console, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 	}
-#endif
 
 	// Use alternate buffer
 	printf("\x1b[?1049h\x1b[?25l");
@@ -122,14 +118,23 @@ int main()
 					{
 						zVal[yProj][xProj] = ooz; // Record z-value of plotted point
 
-						// Calculate luminence, i.e., dot product of unit light vector and vector normal of sphere at sampled point
+						// Calculate diffuse light
 						float L = xLight * cosTHETA + yLight * cosPHI * sinTHETA + zLight * sinPHI * sinTHETA;
+
+						// Calculate specular light
+						normalize(&xSphere, &ySphere, &zSphere);
+						float xH = xLight - xSphere;
+						float yH = yLight - ySphere;
+						float zH = zLight - zSphere;
+						normalize(&xH, &yH, &zH);
+
+						L = min(L + powf(xH * cosTHETA + yH * cosPHI * sinTHETA + zH * sinPHI * sinTHETA, shininess), 1.999999f);
 
 						if (L > 0)
 						{ // Check for positive luminance, i.e., sphere faces towards light at sampled point
-							int indexL = (int)(L * 10);
+							int indexL = (int)(L * 5);
 
-							proj[yProj][xProj] = ".,-~:;+*#@"[indexL]; // Plotted point is "brighter" if luminence is higher
+							proj[yProj][xProj] = "`.:-=+*#%@"[indexL]; // Plotted point is "brighter" if luminence is higher
 						}
 						else // Negative luminence, i.e., sphere faces away from lightt at sampled point
 							proj[yProj][xProj] = ' ';
@@ -191,7 +196,7 @@ int main()
 			zLight = z;
 
 			if (++rotationCount >= rotationLimit)
-				normalizeLight();
+				normalize(&xLight, &yLight, &zLight);
 			break;
 		case KEY_K: // down (light)
 			y = yLight * cosLightInc + zLight * sinLightInc;
@@ -200,7 +205,8 @@ int main()
 			zLight = z;
 
 			if (++rotationCount >= rotationLimit)
-				normalizeLight();
+				normalize(&xLight, &yLight, &zLight);
+
 			break;
 		case KEY_J: // left (light)
 			x = xLight * cosLightInc + zLight * sinLightInc;
@@ -209,7 +215,8 @@ int main()
 			zLight = z;
 
 			if (++rotationCount >= rotationLimit)
-				normalizeLight();
+				normalize(&xLight, &yLight, &zLight);
+
 			break;
 		case KEY_L: // right (light)
 			x = xLight * cosLightInc - zLight * sinLightInc;
@@ -218,7 +225,8 @@ int main()
 			zLight = z;
 
 			if (++rotationCount >= rotationLimit)
-				normalizeLight();
+				normalize(&xLight, &yLight, &zLight);
+
 			break;
 		}
 	}
