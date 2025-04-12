@@ -43,7 +43,7 @@ float zLight = -1;
 const float sinLightInc = 0.01256604f;
 const float cosLightInc = 0.9999210f;
 
-const float shininess = 5.0f;
+const float shininess = 8.0f;
 
 int rotationCount = 0;
 const int rotationLimit = 500;
@@ -132,9 +132,9 @@ int main()
 
 						if (L > 0)
 						{ // Check for positive luminance, i.e., sphere faces towards light at sampled point
-							int indexL = (int)(L * 5);
+							int indexL = (int)(L * 6);
 
-							proj[yProj][xProj] = "`.:-=+*#%@"[indexL]; // Plotted point is "brighter" if luminence is higher
+							proj[yProj][xProj] = "`.':;+=*#$%@"[indexL]; // Plotted point is "brighter" if luminence is higher
 						}
 						else // Negative luminence, i.e., sphere faces away from lightt at sampled point
 							proj[yProj][xProj] = ' ';
